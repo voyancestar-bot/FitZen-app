@@ -1,0 +1,5 @@
+flask
+stripe
+requests
+python-dotenv
+gunicorn
