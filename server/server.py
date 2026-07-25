@@ -31,6 +31,10 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "")
 
 stripe.api_key = STRIPE_SECRET_KEY
+# Désactive la télémétrie : sur certains hébergeurs (ex. Render), platform.platform()
+# retourne une chaîne mal encodée et fait planter les appels Stripe avec une
+# UnicodeEncodeError ("latin-1 codec can't encode..."). Ce réglage évite cet appel.
+stripe.enable_telemetry = False
 
 app = Flask(__name__, static_folder=None)
 # Sans FLASK_SECRET_KEY définie, on en génère une aléatoire au démarrage : les sessions
