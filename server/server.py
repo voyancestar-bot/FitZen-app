@@ -32,8 +32,8 @@ FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "")
 
 for _env_name in ("STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "APP_BASE_URL"):
     _val = os.environ.get(_env_name, "")
-    _bad = [i for i, ch in enumerate(_val) if ord(ch) > 255]
-    log.info("ENV CHECK %s: len=%d ascii_ok=%s bad_positions=%s", _env_name, len(_val), not _bad, _bad[:10])
+    _bad = [(i, ord(ch)) for i, ch in enumerate(_val) if ord(ch) > 255]
+    log.info("ENV CHECK %s: len=%d ascii_ok=%s bad_count=%d bad_sample=%s", _env_name, len(_val), not _bad, len(_bad), _bad[:5])
 
 stripe.api_key = STRIPE_SECRET_KEY
 # Désactive la télémétrie : sur certains hébergeurs (ex. Render), platform.platform()
