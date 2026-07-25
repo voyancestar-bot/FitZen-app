@@ -30,6 +30,11 @@ RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", "FitZen <onboarding@rese
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "")
 
+for _env_name in ("STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "APP_BASE_URL"):
+    _val = os.environ.get(_env_name, "")
+    _bad = [i for i, ch in enumerate(_val) if ord(ch) > 255]
+    log.info("ENV CHECK %s: len=%d ascii_ok=%s bad_positions=%s", _env_name, len(_val), not _bad, _bad[:10])
+
 stripe.api_key = STRIPE_SECRET_KEY
 # Désactive la télémétrie : sur certains hébergeurs (ex. Render), platform.platform()
 # retourne une chaîne mal encodée et fait planter les appels Stripe avec une
