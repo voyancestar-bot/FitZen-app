@@ -477,6 +477,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 // ---------- Messages saisonniers (fêtes de fin d'année) ----------
 
 function handleSeasonalMessages() {
+  const forcePreview = new URLSearchParams(location.hash.split("?")[1] || "").get("preview");
+  if (forcePreview === "postholiday") { showPostHolidayModal(); return; }
+  if (forcePreview === "holiday") { playHolidayChime(); return; }
+
   const now = new Date();
   const month = now.getMonth() + 1; // 1-12
   const day = now.getDate();
