@@ -36,7 +36,7 @@ for _env_name in ("STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "APP_BASE_URL")
     log.info("ENV CHECK %s: len=%d ascii_ok=%s bad_count=%d bad_sample=%s", _env_name, len(_val), not _bad, len(_bad), _bad[:5])
 
 stripe.api_key = STRIPE_SECRET_KEY
-# Désactive la télémétrie : sur certains hébergeurs (ex. Render), platform.platform()
+# Desactive la telemetrie : sur certains hébergeurs (ex. Render), platform.platform()
 # retourne une chaîne mal encodée et fait planter les appels Stripe avec une
 # UnicodeEncodeError ("latin-1 codec can't encode..."). Ce réglage évite cet appel.
 stripe.enable_telemetry = False
