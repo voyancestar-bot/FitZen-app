@@ -23,8 +23,12 @@ def _read_secret_file(filename, fallback_env):
     # (remplacées par des points de masquage). On lit depuis un "Secret File" en priorité
     # (texte brut, pas de champ masqué), avec repli sur la variable d'environnement.
     path = Path("/etc/secrets") / filename
-    if path.is_file():
+    exists = path.is_file()
+    log.info("SECRET FILE CHECK %s: exists=%s", path, exists)
+    if exists:
         val = path.read_text().strip()
+        bad = sum(1 for ch in val if ord(ch) > 255)
+        log.info("SECRET FILE CHECK %s: len=%d bad_count=%d", path, len(val), bad)
         if val:
             return val
     return os.environ.get(fallback_env, "")
