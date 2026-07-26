@@ -96,6 +96,30 @@ const VIDEOS = [
     icon: "🌙",
     description: "Terminez votre journée avec une séance de yoga apaisante en français, pour favoriser un sommeil réparateur.",
     youtubeId: "_bev05G6bDI"
+  },
+  {
+    id: "v9",
+    title: "Perte de poids débutant - Spécial minceur",
+    category: "Minceur",
+    duration: "28 min",
+    level: "Débutant",
+    free: true,
+    color: "grad-4",
+    icon: "🔥",
+    description: "Une séance complète en français, sans matériel et sans saut, pensée pour démarrer en douceur un objectif minceur.",
+    youtubeId: "SXjZyhFFDMg"
+  },
+  {
+    id: "v10",
+    title: "HIIT débutant sans impact - Spécial minceur",
+    category: "Minceur",
+    duration: "20 min",
+    level: "Débutant",
+    free: false,
+    color: "grad-2",
+    icon: "🔥",
+    description: "Un entraînement HIIT en français, sans sauts ni impact, pour brûler des calories efficacement même en débutant.",
+    youtubeId: "n5ssltwyvQk"
   }
 ];
 

@@ -60,6 +60,7 @@ function route() {
   destroyAudioPlayer(); // coupe toute lecture audio en cours avant de changer de page
   destroyVideoPlayer();
 
+  currentFilter = params.get("cat") || "Tous";
   let html = "";
   if (parts.length === 0) {
     html = renderHome();
@@ -85,7 +86,6 @@ function route() {
     html = notFound();
   }
 
-  currentFilter = "Tous";
   app.innerHTML = html;
   document.getElementById("header-slot").innerHTML = renderHeader();
   document.getElementById("footer-slot").innerHTML = renderFooter();
@@ -164,6 +164,11 @@ document.addEventListener("click", async (e) => {
 
   if (action === "toggle-nav") {
     document.getElementById("nav-links").classList.toggle("open");
+  }
+
+  if (action === "close-seasonal-modal") {
+    const overlay = t.closest(".modal-overlay") || document.querySelector(".modal-overlay");
+    if (overlay) overlay.remove();
   }
 
   if (action === "toggle-fav") {
@@ -466,7 +471,76 @@ window.addEventListener("DOMContentLoaded", async () => {
   await loadAppConfig();
   route();
   syncSessionFromServer();
+  handleSeasonalMessages();
 });
+
+// ---------- Messages saisonniers (fêtes de fin d'année) ----------
+
+function handleSeasonalMessages() {
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1-12
+  const day = now.getDate();
+  const isHolidayPeriod = (month === 12 && day >= 20) || (month === 1 && day <= 2);
+  const isPostHolidayPeriod = month === 1 && day >= 3 && day <= 31;
+
+  if (isHolidayPeriod && !sessionStorage.getItem("fitzen_holiday_chime")) {
+    sessionStorage.setItem("fitzen_holiday_chime", "1");
+    setTimeout(() => playHolidayChime(), 600);
+  }
+
+  if (isPostHolidayPeriod && !sessionStorage.getItem("fitzen_postholiday_modal")) {
+    sessionStorage.setItem("fitzen_postholiday_modal", "1");
+    setTimeout(() => showPostHolidayModal(), 800);
+  }
+}
+
+function playHolidayChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    // Petit motif festif (plus long que le jingle de bienvenue).
+    const notes = [523.25, 523.25, 587.33, 523.25, 698.46, 659.25];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      const start = ctx.currentTime + i * 0.22;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.22, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.55);
+    });
+    if (window.speechSynthesis) {
+      setTimeout(() => {
+        const utter = new SpeechSynthesisUtterance("Joyeuses fêtes !");
+        utter.lang = "fr-FR";
+        utter.pitch = 1.2;
+        window.speechSynthesis.speak(utter);
+      }, notes.length * 220 + 200);
+    }
+  } catch (e) {
+    // Audio indisponible : on ignore.
+  }
+}
+
+function showPostHolidayModal() {
+  const node = el(`
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <button class="modal-close" data-action="close-seasonal-modal">✕</button>
+        <div style="font-size:2.2rem; margin-bottom:8px;">🎄🍽️</div>
+        <h2 style="margin:0 0 12px;">Un peu trop mangé pendant les fêtes ?</h2>
+        <p class="detail-desc" style="margin-bottom:20px;">Pas de panique, on reprend en douceur — direction les séances spécial minceur pour repartir du bon pied.</p>
+        <a href="#/videos?cat=Minceur" class="btn btn-primary" data-action="close-seasonal-modal">Aller voir les cours pour mincir</a>
+      </div>
+    </div>
+  `);
+  document.body.appendChild(node);
+}
 
 // ---------- Connexion Google (Google Identity Services) ----------
 
