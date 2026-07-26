@@ -479,7 +479,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 function handleSeasonalMessages() {
   const forcePreview = new URLSearchParams(location.hash.split("?")[1] || "").get("preview");
   if (forcePreview === "postholiday") { showPostHolidayModal(); return; }
-  if (forcePreview === "holiday") { playHolidayChime(); return; }
+  if (forcePreview === "holiday") {
+    // Les navigateurs bloquent le son tant qu'il n'y a pas eu de clic sur la page :
+    // on attend le premier clic avant de jouer le jingle en mode aperçu.
+    toast("Clique n'importe où pour entendre le son 🔊");
+    document.addEventListener("click", () => playHolidayChime(), { once: true });
+    return;
+  }
 
   const now = new Date();
   const month = now.getMonth() + 1; // 1-12
