@@ -18,7 +18,19 @@ load_dotenv(ROOT_DIR / ".env")
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("fitzen")
 
-STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+def _read_secret_file(filename, fallback_env):
+    # Sur Render, le champ "Environment Variables" masqué corrompt certaines valeurs longues
+    # (remplacées par des points de masquage). On lit depuis un "Secret File" en priorité
+    # (texte brut, pas de champ masqué), avec repli sur la variable d'environnement.
+    path = Path("/etc/secrets") / filename
+    if path.is_file():
+        val = path.read_text().strip()
+        if val:
+            return val
+    return os.environ.get(fallback_env, "")
+
+
+STRIPE_SECRET_KEY = _read_secret_file("stripe_secret_key", "STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
 STRIPE_PRICE_MONTHLY = os.environ.get("STRIPE_PRICE_MONTHLY", "")
 STRIPE_PRICE_ANNUAL = os.environ.get("STRIPE_PRICE_ANNUAL", "")
@@ -29,11 +41,6 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", "FitZen <onboarding@resend.dev>")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "")
-
-for _env_name in ("STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "APP_BASE_URL"):
-    _val = os.environ.get(_env_name, "")
-    _bad = [(i, ord(ch)) for i, ch in enumerate(_val) if ord(ch) > 255]
-    log.info("ENV CHECK %s: len=%d ascii_ok=%s bad_count=%d bad_sample=%s", _env_name, len(_val), not _bad, len(_bad), _bad[:5])
 
 stripe.api_key = STRIPE_SECRET_KEY
 # Desactive la telemetrie : sur certains hébergeurs (ex. Render), platform.platform()
