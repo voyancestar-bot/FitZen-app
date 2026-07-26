@@ -330,6 +330,7 @@ document.addEventListener("click", async (e) => {
       if (res.ok && data.user) {
         Store.setUser(data.user);
         toast(`Bienvenue ${data.user.name} 👋`);
+        playWelcomeChime(data.user.name);
         rerenderBody();
       } else if (res.status === 401) {
         if (passwordErrorEl) { passwordErrorEl.textContent = "⚠️ " + (data.message || "Email ou mot de passe incorrect."); passwordErrorEl.style.display = "block"; }
@@ -504,6 +505,7 @@ async function handleGoogleCredential(response) {
     if (res.ok && data.user) {
       Store.setUser(data.user);
       toast(`Bienvenue ${data.user.name} 👋`);
+      playWelcomeChime(data.user.name);
       rerenderBody();
     } else {
       toast(data.message || "Connexion Google impossible");
