@@ -409,6 +409,7 @@ def create_checkout_session():
             success_url=f"{APP_BASE_URL}/#/abonnement?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{APP_BASE_URL}/#/abonnement?canceled=1",
             metadata={"plan": plan, "name": name},
+            allow_promotion_codes=True,
         )
         return jsonify({"url": session.url, "id": session.id})
     except stripe.error.StripeError as e:
@@ -452,6 +453,7 @@ def create_session_checkout():
             success_url=f"{APP_BASE_URL}/#/{content_type}s/{content_id}?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{APP_BASE_URL}/#/{content_type}s/{content_id}?canceled=1",
             metadata={"kind": "session_purchase", "contentType": content_type, "contentId": content_id},
+            allow_promotion_codes=True,
         )
         return jsonify({"url": session.url, "id": session.id})
     except stripe.error.StripeError as e:
