@@ -19,16 +19,12 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("fitzen")
 
 def _read_secret_file(filename, fallback_env):
-    # Sur Render, le champ "Environment Variables" masqué corrompt certaines valeurs longues
-    # (remplacées par des points de masquage). On lit depuis un "Secret File" en priorité
-    # (texte brut, pas de champ masqué), avec repli sur la variable d'environnement.
+    # Sur Render, le champ "Environment Variables" masqué peut corrompre certaines valeurs
+    # longues copiées depuis un chat (redaction du presse-papier). On lit depuis un
+    # "Secret File" en priorité (texte brut), avec repli sur la variable d'environnement.
     path = Path("/etc/secrets") / filename
-    exists = path.is_file()
-    log.info("SECRET FILE CHECK %s: exists=%s", path, exists)
-    if exists:
+    if path.is_file():
         val = path.read_text().strip()
-        bad = sum(1 for ch in val if ord(ch) > 255)
-        log.info("SECRET FILE CHECK %s: len=%d bad_count=%d", path, len(val), bad)
         if val:
             return val
     return os.environ.get(fallback_env, "")
