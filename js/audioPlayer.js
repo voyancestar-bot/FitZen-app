@@ -74,6 +74,7 @@ function initAudioPlayer(youtubeId, hostId, previewLimitSeconds, previewStartSec
             btn.textContent = "▶";
             const seek = document.querySelector(`[data-audio-seek="${hostId}"]`);
             if (seek) seek.value = 0;
+            if (typeof showEndOfSessionQuiz === "function") showEndOfSessionQuiz();
           }
         }
       }

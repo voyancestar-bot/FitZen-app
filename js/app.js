@@ -171,6 +171,24 @@ document.addEventListener("click", async (e) => {
     if (overlay) overlay.remove();
   }
 
+  if (action === "close-quiz") {
+    const overlay = t.closest(".modal-overlay");
+    if (overlay) overlay.remove();
+  }
+
+  if (action === "quiz-answer") {
+    const { q, v } = t.dataset;
+    _quizAnswers[q] = v;
+    t.parentElement.querySelectorAll(".quiz-opt").forEach(b => b.classList.remove("selected"));
+    t.classList.add("selected");
+  }
+
+  if (action === "submit-quiz") {
+    const overlay = t.closest(".modal-overlay");
+    if (overlay) overlay.remove();
+    toast("Merci pour ton retour ! 🙌");
+  }
+
   if (action === "toggle-fav") {
     e.preventDefault();
     Store.toggleFavorite(t.dataset.id);
@@ -535,6 +553,56 @@ function playHolidayChime() {
   } catch (e) {
     // Audio indisponible : on ignore.
   }
+}
+
+// ---------- Petit questionnaire de fin de séance ----------
+
+let _quizAnswers = { finished: null, feeling: null, again: null };
+
+function showEndOfSessionQuiz() {
+  if (document.querySelector(".modal-box[data-quiz]")) return; // déjà affiché
+  _quizAnswers = { finished: null, feeling: null, again: null };
+  const title = document.querySelector(".detail-title")?.textContent || "cette séance";
+  const node = el(`
+    <div class="modal-overlay">
+      <div class="modal-box" data-quiz>
+        <button class="modal-close" data-action="close-quiz">✕</button>
+        <div style="font-size:2rem; margin-bottom:8px;">🏁</div>
+        <h2 style="margin:0 0 6px;">Séance terminée !</h2>
+        <p class="detail-desc" style="margin-bottom:20px;">Quelques secondes pour nous dire comment ça s'est passé sur « ${escapeHtml(title)} ».</p>
+
+        <div class="quiz-question">
+          <p class="quiz-label">As-tu suivi la séance en entier ?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-action="quiz-answer" data-q="finished" data-v="oui">Oui</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="finished" data-v="partiel">En partie</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="finished" data-v="non">Non</button>
+          </div>
+        </div>
+
+        <div class="quiz-question">
+          <p class="quiz-label">Comment tu te sens ?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-action="quiz-answer" data-q="feeling" data-v="fatigue">😴 Fatigué·e</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="feeling" data-v="neutre">😐 Neutre</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="feeling" data-v="forme">💪 En forme</button>
+          </div>
+        </div>
+
+        <div class="quiz-question">
+          <p class="quiz-label">Referais-tu cette séance ?</p>
+          <div class="quiz-options">
+            <button class="quiz-opt" data-action="quiz-answer" data-q="again" data-v="oui">Oui</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="again" data-v="peut-etre">Peut-être</button>
+            <button class="quiz-opt" data-action="quiz-answer" data-q="again" data-v="non">Non</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" data-action="submit-quiz" style="margin-top:8px;">Envoyer mon retour</button>
+      </div>
+    </div>
+  `);
+  document.body.appendChild(node);
 }
 
 function showPostHolidayModal() {

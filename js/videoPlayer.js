@@ -82,6 +82,7 @@ function initVideoPlayer(youtubeId, hostId, previewLimitSeconds, startAtSeconds)
             updateVideoPlayButton(hostId, false);
             const seek = document.querySelector(`[data-video-seek="${hostId}"]`);
             if (seek) seek.value = 0;
+            if (typeof showEndOfSessionQuiz === "function") showEndOfSessionQuiz();
           }
         }
       }
