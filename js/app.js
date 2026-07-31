@@ -7,6 +7,19 @@ const NAV_ITEMS = [
   { path: "#/compte", label: "Compte" }
 ];
 
+// ---------- Thème clair/sombre (bascule manuelle) ----------
+
+function getTheme() {
+  return localStorage.getItem("fitzen_theme") || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("fitzen_theme", theme);
+}
+
+applyTheme(getTheme());
+
 function renderHeader() {
   const hash = location.hash || "#/";
   const base = "#/" + (hash.split("/")[1] || "").split("?")[0];
@@ -21,6 +34,7 @@ function renderHeader() {
           `).join("")}
         </nav>
         <div class="header-actions">
+          <button class="theme-toggle" data-action="toggle-theme" title="Changer de thème">${getTheme() === "light" ? "🌙" : "☀️"}</button>
           ${Store.isSubscribed
             ? `<span class="badge badge-premium">★ Premium</span>`
             : Store.isLoggedIn
@@ -164,6 +178,11 @@ document.addEventListener("click", async (e) => {
 
   if (action === "toggle-nav") {
     document.getElementById("nav-links").classList.toggle("open");
+  }
+
+  if (action === "toggle-theme") {
+    applyTheme(getTheme() === "light" ? "dark" : "light");
+    rerenderBody();
   }
 
   if (action === "close-seasonal-modal") {
